@@ -14,10 +14,11 @@ Canny::Canny(const QString& grpName, QWidget* parent)
 	addConfig(std::make_shared<Config>("Threshold 1", 10, Config::Type::SPIN_DOUBLE, 1, 200, 1));
 	addConfig(std::make_shared<Config>("Threshold 2", 100, Config::Type::SPIN_DOUBLE, 1, 200, 1));
 	addConfig(std::make_shared<Config>("Sobel Apature", 3, Config::Type::SPIN_INT, 1, 101, 2 ));
-	addConfig(std::make_shared<ComboxConfig>("Combox", QStringList({ "1","2","3", "4", "5"})));
+	//addConfig(std::make_shared<ComboxConfig>("Combox", QStringList({ "1","2","3", "4", "5"})));
 	setupWidget();
 
 }
+
 void Canny::addConfig(std::shared_ptr<Config> config)
 {
 	mConfigs.push_back(config);
