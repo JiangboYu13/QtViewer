@@ -24,6 +24,7 @@ void GaussianBlur::onConfirm()
 }
 void GaussianBlur::onKSizeChanged(int value)
 {
+    if (value%2==0) value = value+1;
 	mKsize = cv::Size(value,value);
 }
 void GaussianBlur::onSigmaChanged(double value)

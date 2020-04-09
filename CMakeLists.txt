@@ -34,17 +34,31 @@ target_link_libraries(GaussianBlur
 					  Qt5::Widgets 
 					  Qt5::Core Qt5::Gui)
 
+add_library(Canny 
+		    src/Canny.cpp 
+		    include/Canny.h 
+		    include/ImgProcessorBase.h)
+target_link_libraries(Canny 
+					  ${OpenCV_LIBS} 
+					  Qt5::Widgets 
+					  Qt5::Core Qt5::Gui)
+
+
 
 add_executable(${PROJECT_NAME} 
 			   src/QtViewer.cpp 
 			   include/QtViewer.h 
 			   include/GaussianBlur.h 
 			   include/ImgProcessorBase.h 
+			   include/Canny.h 
 			   src/main.cpp)
 target_link_libraries(${PROJECT_NAME}  
 					  ${OpenCV_LIBS} 
 					  Qt5::Widgets 
 					  Qt5::Core 
 					  Qt5::Gui 
-					  GaussianBlur)
-
+					  GaussianBlur
+					  Canny)
+if (WIN32)
+	set_target_properties(${PROJECT_NAME}  PROPERTIES WIN32_EXECUTABLE true)
+endif(WIN32)

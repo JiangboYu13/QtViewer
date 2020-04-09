@@ -17,55 +17,98 @@
 #include <QGridLayout>
 #include <QRadioButton>
 QtViewer::QtViewer(QWidget *parent)
-   : QMainWindow(parent), mImgLabel(new QLabel), mImgLabelProc(new QLabel)
+   : QMainWindow(parent), mImgLabel(new QLabel), mImgLabelProc(new QLabel), mMainLayout(new QGridLayout(this))
 {
+	mCurModeIdx = -1;
     mImgLabel->setBackgroundRole(QPalette::Base);
     mImgLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     mImgLabel->setScaledContents(true);
     mImgLabel->setFrameShape(QFrame::Panel);
 	mImgLabel->setFrameShadow(QFrame::Sunken);
 	mImgLabel->setLineWidth(3);
-
-
     mImgLabelProc->setBackgroundRole(QPalette::Base);
     mImgLabelProc->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     mImgLabelProc->setScaledContents(true);
 	mImgLabelProc->setFrameShape(QFrame::Panel);
 	mImgLabelProc->setFrameShadow(QFrame::Sunken);
 	mImgLabelProc->setLineWidth(3);
-    mModeGrp = new QGroupBox(tr("Mode Seletion"),this);
-    setupModeGroup(mModeGrp);
-
-    mProcessor = new GaussianBlur(tr("Gaussian Blur"), this);
-    connect(mProcessor, &ImgProcessorBase::valueChanged, this, &QtViewer::onProcess);
-    createActions();
-    QGridLayout* mainLayout = new QGridLayout(this);
-    mainLayout->addWidget(mImgLabel, 0, 0, 10, 1);
-    mainLayout->addWidget(mImgLabelProc, 0, 1, 10, 1);
-    mainLayout->addWidget(mModeGrp, 10, 0, 2, 1);
-    mainLayout->addWidget(mProcessor, 10, 1, 2, 1);
-    mainLayout->setColumnStretch(0, 1);
-    mainLayout->setColumnStretch(1, 1);
+	mMainLayout->addWidget(mImgLabel, 0, 0, 10, 1);
+	mMainLayout->addWidget(mImgLabelProc, 0, 1, 10, 1);
+	setupProcessor();
+	setupModeGroup();
+	createActions();
+	mMainLayout->setColumnStretch(0, 1);
+	mMainLayout->setColumnStretch(1, 1);
     mainwindow = new QWidget(this);
-    mainwindow->setLayout(mainLayout);
+    mainwindow->setLayout(mMainLayout);
     setCentralWidget(mainwindow);
     resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
+	statusBar()->showMessage(tr("Initialized"));
+}
+
+
+void QtViewer::setupProcessor()
+{
+	mProContainer.push_back(new GaussianBlur(tr("Gaussian Blur"), this));
+	mProContainer.push_back(new Canny(tr("Canny"), this));
+	for (auto processor : mProContainer)
+	{
+		connect(processor, &ImgProcessorBase::valueChanged, this, &QtViewer::onProcess);
+		mMainLayout->addWidget(processor, 10, 1, 2, 1);
+		processor->hide();
+	}
+	if (mProContainer.size() > 0) { 
+		mCurModeIdx = 0;
+		mProContainer[mCurModeIdx]->show();
+	}
+		
+}
+
+void QtViewer::setupModeGroup()
+{
+	mModeGrp = new QGroupBox(tr("Mode Seletion"), this);
+	QGridLayout* grp_layout = new QGridLayout(this);
+	for (int idx = 0; idx<mProContainer.size(); idx++)
+	{
+		mModeContainer.push_back(new QRadioButton(mProContainer[idx]->modeName(), this));
+		grp_layout->addWidget(mModeContainer[idx], int(idx / 3), idx % 3, 1, 1, Qt::AlignLeft);
+		connect(mModeContainer[idx], &QRadioButton::toggled, this, &QtViewer::onModeChanged);
+	}
+	if(mCurModeIdx>-1)
+		mModeContainer[mCurModeIdx]->setChecked(true);
+	mModeGrp->setLayout(grp_layout);
+	mMainLayout->addWidget(mModeGrp, 10, 0, 2, 1);
+}
+
+
+void QtViewer::onModeChanged()
+{
+	for (int idx = 0; idx < mModeContainer.size(); idx++)
+	{
+		if (mModeContainer[idx]->isChecked() && mCurModeIdx != idx)
+		{
+				mProContainer[mCurModeIdx]->hide();
+				mProContainer[idx]->show();
+				statusBar()->showMessage(tr("Mode Changed from %1 to %2")
+											.arg(mProContainer[mCurModeIdx]->modeName())
+											.arg(mProContainer[idx]->modeName()));
+				mCurModeIdx = idx;
+				onProcess();
+				break;
+
+		}
+	}
 }
 void QtViewer::onProcess()
 {
-	cv::Mat img;
-	mProcessor->process(mCvImg,img);
-	setImageProc(img);
+	if (mCvImg.data && mCurModeIdx > -1)
+	{
+		cv::Mat img;
+		mProContainer[mCurModeIdx]->process(mCvImg, img);
+		setImageProc(img);
+	}
 }
-void QtViewer::setupModeGroup(QGroupBox* grp)
-{
-	QGridLayout* grp_layout = new QGridLayout(this);
-	QRadioButton* gaussian_mode = new QRadioButton("Gaussian Mode", this);
-	QRadioButton* gray_mode = new QRadioButton("Grayscale Mode", this);
-	grp_layout->addWidget(gaussian_mode, 0, 0, 1, 1, Qt::AlignLeft);
-	grp_layout->addWidget(gray_mode, 0, 1, 1, 1, Qt::AlignLeft);
-	grp->setLayout(grp_layout);
-}
+
 bool QtViewer::loadFile(const QString &fileName)
 {
     mCvImg = cv::imread(fileName.toStdString(), CV_LOAD_IMAGE_COLOR);
@@ -78,10 +121,8 @@ bool QtViewer::loadFile(const QString &fileName)
 //! [2]
     cv::cvtColor(mCvImg, mCvImg, CV_BGR2RGB);
     setImage(mCvImg);
-    cv::Mat gray;
-    cv::cvtColor(mCvImg, gray, CV_RGB2GRAY);
     setWindowFilePath(fileName);
-
+	onProcess();
     const QString message = tr("Opened \"%1\", %2x%3, Depth: %4")
         .arg(QDir::toNativeSeparators(fileName)).arg(mCvImg.cols).arg(mCvImg.rows).arg(mCvImg.channels());
     statusBar()->showMessage(message);
