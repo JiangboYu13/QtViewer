@@ -28,7 +28,8 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(GaussianBlur 
 		    src/GaussianBlur.cpp 
 		    include/GaussianBlur.h 
-		    include/ImgProcessorBase.h)
+		    include/ImgProcessorBase.h
+		    src/ImgProcessorBase.cpp)
 target_link_libraries(GaussianBlur 
 					  ${OpenCV_LIBS} 
 					  Qt5::Widgets 
@@ -37,7 +38,8 @@ target_link_libraries(GaussianBlur
 add_library(Canny 
 		    src/Canny.cpp 
 		    include/Canny.h 
-		    include/ImgProcessorBase.h)
+		    include/ImgProcessorBase.h
+		    src/ImgProcessorBase.cpp)
 target_link_libraries(Canny 
 					  ${OpenCV_LIBS} 
 					  Qt5::Widgets 

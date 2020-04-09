@@ -4,22 +4,9 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <string>
 #include <QObject>
 #include <QStringList>
-class ImgProcessorBase:public QGroupBox
-{
-	Q_OBJECT
-public:
-	ImgProcessorBase(const QString& grpName, QWidget* parent):QGroupBox(grpName, parent), mGrpName(grpName){};
-	virtual void process(const cv::Mat&, cv::Mat&) = 0;
-	QString modeName() { return mGrpName;};
-signals:
-    void valueChanged();
-private:
-	QString mGrpName;
-
-};
+#include <memory>
 
 class Config{	
 public:
@@ -39,3 +26,24 @@ public:
 	ComboxConfig(QString name, QStringList options) : mOptions(options), Config(name, 0, Type::COMBOX, 0, options.size() - 1, 1) {}
 	QStringList mOptions;
 };
+
+class ImgProcessorBase:public QGroupBox
+{
+	Q_OBJECT
+public:
+	ImgProcessorBase(const QString& grpName, QWidget* parent):QGroupBox(grpName, parent), mGrpName(grpName){};
+	virtual void process(const cv::Mat&, cv::Mat&) = 0;
+	QString modeName() { return mGrpName;};
+signals:
+    void valueChanged();
+public slots:
+		void onConfirm();
+protected:
+	QString mGrpName;
+	std::vector<QWidget*> mConfigWidgets;
+	std::vector<std::shared_ptr<Config>> mConfigs;
+	void setupWidget();
+	void addConfig(std::shared_ptr<Config>);
+
+};
+

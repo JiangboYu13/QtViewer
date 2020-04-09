@@ -17,16 +17,4 @@ class GaussianBlur:public ImgProcessorBase
 	public:
 		GaussianBlur(const QString& grpName="", QWidget* parent=nullptr);
 		virtual void process(const cv::Mat&, cv::Mat&) override;
-	public slots:
-		void onConfirm();
-		void onSigmaChanged(double value);
-		void onKSizeChanged(int value);
-	private:
-		QSpinBox* ksizeValue;
-		QDoubleSpinBox* sigmaXValue;
-		QDoubleSpinBox* sigmaYValue;
-		void setupWidget();
-		cv::Size mKsize;
-		double mSigmaX;
-		double mSigmaY;
 };
