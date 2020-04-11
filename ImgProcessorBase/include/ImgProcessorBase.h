@@ -7,10 +7,10 @@
 #include <QObject>
 #include <QStringList>
 #include <memory>
-
+#include <map>
 class Config{	
 public:
-	enum class Type { SPIN_INT, SPIN_DOUBLE, COMBOX };
+	enum class Type { SPIN_INT, SPIN_DOUBLE, COMBOX, CHECKBOX};
 	void onValueChanged(double value) { mValue = value; }
 	Config(QString name, double value, Type type, double min=0, double max=100, double step=1): 
 		mName(name), mMin(min), mMax(max), mStep(step), mValue(value), mType(type){}
@@ -36,12 +36,13 @@ public:
 	QString modeName() { return mGrpName;};
 signals:
     void valueChanged();
-public slots:
-		void onConfirm();
+protected slots:
+	void onConfirm();
+	virtual void keyPressEvent(QKeyEvent *event) override;
 protected:
 	QString mGrpName;
 	std::vector<QWidget*> mConfigWidgets;
-	std::vector<std::shared_ptr<Config>> mConfigs;
+	std::map<QString, std::shared_ptr<Config>> mConfigs;
 	void setupWidget();
 	void addConfig(std::shared_ptr<Config>);
 
