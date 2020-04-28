@@ -18,6 +18,7 @@
 #include "Canny.h"
 #include "CheckableLabel.h"
 #include "ORB.h"
+#include "SIFT.h"
 QT_BEGIN_NAMESPACE
 class QAction;
 class QLabel;

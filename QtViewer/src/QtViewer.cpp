@@ -93,6 +93,7 @@ void QtViewer::setupProcessor()
 	mProContainer.push_back(new GaussianBlur(tr("Gaussian Blur"), this));
 	mProContainer.push_back(new Canny(tr("Canny"), this));
 	mProContainer.push_back(new ORB(tr("ORB"), this));
+	mProContainer.push_back(new SIFT(tr("SIFT"), this));
 	for (auto processor : mProContainer)
 	{
 		connect(processor, &ImgProcessorBase::valueChanged, this, &QtViewer::onProcess);

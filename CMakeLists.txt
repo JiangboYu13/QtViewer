@@ -30,4 +30,5 @@ add_subdirectory(Canny)
 add_subdirectory(QtViewer)
 add_subdirectory(CheckableLabel)
 add_subdirectory(ORB)
+add_subdirectory(SIFT)
  
