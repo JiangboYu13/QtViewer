@@ -28,4 +28,6 @@ add_subdirectory(ImgProcessorBase)
 add_subdirectory(GaussianBlur)
 add_subdirectory(Canny)
 add_subdirectory(QtViewer)
+add_subdirectory(CheckableLabel)
+add_subdirectory(ORB)
  

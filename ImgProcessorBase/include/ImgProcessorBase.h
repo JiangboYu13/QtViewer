@@ -8,6 +8,7 @@
 #include <QStringList>
 #include <memory>
 #include <map>
+#include <vector>
 class Config{	
 public:
 	enum class Type { SPIN_INT, SPIN_DOUBLE, COMBOX, CHECKBOX};
@@ -32,10 +33,11 @@ class ImgProcessorBase:public QGroupBox
 	Q_OBJECT
 public:
 	ImgProcessorBase(const QString& grpName, QWidget* parent):QGroupBox(grpName, parent), mGrpName(grpName){};
-	virtual void process(const cv::Mat&, cv::Mat&) = 0;
+	virtual void process(const  std::vector<cv::Mat>&, cv::Mat&) = 0;
 	QString modeName() { return mGrpName;};
 signals:
     void valueChanged();
+	void log(QString msg);
 protected slots:
 	void onConfirm();
 	virtual void keyPressEvent(QKeyEvent *event) override;

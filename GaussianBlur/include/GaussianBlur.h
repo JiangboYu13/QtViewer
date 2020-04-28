@@ -16,5 +16,5 @@ class GaussianBlur:public ImgProcessorBase
 	Q_OBJECT
 	public:
 		GaussianBlur(const QString& grpName="", QWidget* parent=nullptr);
-		virtual void process(const cv::Mat&, cv::Mat&) override;
+		virtual void process(const  std::vector<cv::Mat>& inImg, cv::Mat& outImg) override;
 };

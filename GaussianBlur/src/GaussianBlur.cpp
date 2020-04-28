@@ -17,8 +17,9 @@ GaussianBlur::GaussianBlur(const QString& grpName, QWidget* parent)
     setupWidget();
 }
 
-void GaussianBlur::process(const cv::Mat& inImg, cv::Mat& outImg)
+void GaussianBlur::process(const  std::vector<cv::Mat>& inImg, cv::Mat& outImg)
 {
-    cv::GaussianBlur(inImg, outImg,  cv::Size(mConfigs["Kernel Size"]->mValue,mConfigs["Kernel Size"]->mValue),  mConfigs["Sigma X"]->mValue,  mConfigs["Sigma Y"]->mValue);
+	if (inImg.size() < 1) return;
+    cv::GaussianBlur(inImg[0], outImg,  cv::Size(mConfigs["Kernel Size"]->mValue,mConfigs["Kernel Size"]->mValue),  mConfigs["Sigma X"]->mValue,  mConfigs["Sigma Y"]->mValue);
 }
 

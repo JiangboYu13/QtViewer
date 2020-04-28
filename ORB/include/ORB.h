@@ -5,10 +5,11 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-class Canny:public ImgProcessorBase
+#include <opencv2/features2d/features2d.hpp>
+class ORB:public ImgProcessorBase
 {
 	Q_OBJECT
 	public:
-		Canny(const QString& grpName="", QWidget* parent=nullptr);
+		ORB(const QString& grpName="", QWidget* parent=nullptr);
 		virtual void process(const std::vector<cv::Mat>& inImg, cv::Mat& outImg) override;
 };

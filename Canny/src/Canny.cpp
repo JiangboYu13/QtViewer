@@ -10,9 +10,10 @@ Canny::Canny(const QString& grpName, QWidget* parent)
 	setupWidget();
 }
 
-void Canny::process(const cv::Mat& inImg, cv::Mat& outImg)
+void Canny::process(const std::vector<cv::Mat>& inImg, cv::Mat& outImg)
 {
-    cv::cvtColor(inImg, outImg, CV_RGB2GRAY);
+	if (inImg.size() < 1) return;
+    cv::cvtColor(inImg[0], outImg, cv::COLOR_RGB2GRAY);
 	cv::Canny(outImg, outImg, mConfigs["Threshold 1"]->mValue, mConfigs["Threshold 2"]->mValue, int(mConfigs["Sobel Apature"]->mValue));
-    cv::cvtColor(outImg, outImg, CV_GRAY2RGB);
+    cv::cvtColor(outImg, outImg, cv::COLOR_GRAY2RGB);
 }
