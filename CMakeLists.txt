@@ -7,6 +7,14 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+option(OPENCV_CONTRIB_FEATURE "Option description" OFF)
+
+if(OPENCV_CONTRIB_FEATURE)
+  add_definitions(-DUSE_CONTRIB_FEATURE)
+endif()
+
+
+
 if (WIN32)
   	set (QT5_CMAKE_DIR "C:/Qt/5.13.0/msvc2015_64/lib/cmake")
 	set (Qt5Widgets_DIR ${QT5_CMAKE_DIR}/Qt5Widgets)
@@ -30,5 +38,7 @@ add_subdirectory(Canny)
 add_subdirectory(QtViewer)
 add_subdirectory(CheckableLabel)
 add_subdirectory(ORB)
-add_subdirectory(SIFT)
+if(OPENCV_CONTRIB_FEATURE)
+	add_subdirectory(SIFT)
+endif()
  

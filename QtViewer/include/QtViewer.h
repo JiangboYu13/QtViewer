@@ -18,7 +18,9 @@
 #include "Canny.h"
 #include "CheckableLabel.h"
 #include "ORB.h"
-#include "SIFT.h"
+#ifdef USE_CONTRIB_FEATURE
+	#include "SIFT.h"
+#endif
 QT_BEGIN_NAMESPACE
 class QAction;
 class QLabel;

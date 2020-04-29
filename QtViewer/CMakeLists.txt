@@ -10,8 +10,8 @@ add_executable(${PROJECT_NAME}
 			   ${CMAKE_ROOT_DIR}/Canny/include/Canny.h 
 			   ${CMAKE_ROOT_DIR}/CheckableLabel/include/CheckableLabel.h
 			   ${CMAKE_ROOT_DIR}/ORB/include/ORB.h
-			   ${CMAKE_ROOT_DIR}/SIFT/include/SIFT.h
 			   src/main.cpp)
+
 
 target_include_directories(${PROJECT_NAME}  PUBLIC include/)
 target_link_libraries(${PROJECT_NAME}  
@@ -23,8 +23,13 @@ target_link_libraries(${PROJECT_NAME}
 					  Canny
 					  ImgProcessorBase
 					  CheckableLabel
-					  ORB
-					  SIFT)
-#if (WIN32)
-#	set_target_properties(${PROJECT_NAME}  PROPERTIES WIN32_EXECUTABLE true)
-#endif(WIN32)
+					  ORB)
+
+if(OPENCV_CONTRIB_FEATURE)
+	target_include_directories(${PROJECT_NAME}  PUBLIC  ${CMAKE_ROOT_DIR}/SIFT/include/SIFT.h)
+	target_link_libraries(${PROJECT_NAME}  SIFT)
+endif()
+
+if (WIN32)
+	set_target_properties(${PROJECT_NAME}  PROPERTIES WIN32_EXECUTABLE true)
+endif(WIN32)

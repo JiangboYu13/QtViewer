@@ -1,7 +1,7 @@
 #include "ORB.h"
 #include<chrono>
 #include<opencv2/opencv.hpp>
-
+#include <limits>
 ORB::ORB(const QString& grpName, QWidget* parent)
 		:ImgProcessorBase(grpName, parent)
 {
@@ -52,7 +52,25 @@ void ORB::process(const std::vector<cv::Mat>& inImg, cv::Mat& outImg)
     matcher.match(descriptors_1, descriptors_2, matches);
 	t2 = std::chrono::steady_clock::now();
 	milliseconds_type match_t = std::chrono::duration_cast<milliseconds_type>(t2 - t1);
-	const QString message = tr("Detection costs %1 ms. Matching costs %2 ms").arg(detect_t.count()).arg(match_t.count());
+	
+
+
+	auto min_max = minmax_element(matches.begin(), matches.end(),
+                                [](const cv::DMatch &m1, const cv::DMatch &m2) { return m1.distance < m2.distance; });
+	double min_dist = min_max.first->distance;
+  	double max_dist = min_max.second->distance;
+	const QString message = tr("Detection costs %1 ms. Matching costs %2 ms. Max dist %3. Min dist %4. ")
+							.arg(detect_t.count())
+							.arg(match_t.count())
+							.arg(max_dist)
+							.arg(min_dist);
 	emit log(message);
-    cv::drawMatches(img1, keypoints_1, img2, keypoints_2, matches, outImg);
-}																																																	 
+	std::vector<cv::DMatch> good_matches;
+	for (auto match : matches) 
+	{
+	    if (match.distance <= std::max(2 * min_dist, 30.0)) {
+	      good_matches.push_back(match);
+	    }
+	}
+    cv::drawMatches(img1, keypoints_1, img2, keypoints_2, good_matches, outImg);
+}																																																 

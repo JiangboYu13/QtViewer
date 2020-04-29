@@ -93,7 +93,9 @@ void QtViewer::setupProcessor()
 	mProContainer.push_back(new GaussianBlur(tr("Gaussian Blur"), this));
 	mProContainer.push_back(new Canny(tr("Canny"), this));
 	mProContainer.push_back(new ORB(tr("ORB"), this));
-	mProContainer.push_back(new SIFT(tr("SIFT"), this));
+	#ifdef USE_CONTRIB_FEATURE
+		mProContainer.push_back(new SIFT(tr("SIFT"), this));
+	#endif
 	for (auto processor : mProContainer)
 	{
 		connect(processor, &ImgProcessorBase::valueChanged, this, &QtViewer::onProcess);
@@ -167,7 +169,7 @@ void QtViewer::onProcess()
 void QtViewer::addImage(const cv::Mat &matImage, QImage::Format format)
 {
 
-	QImage newImage((uchar*)matImage.data, matImage.cols, matImage.rows, format);
+	QImage newImage((uchar*)matImage.data, matImage.cols, matImage.rows, matImage.step, format);
 	QLabel* newLabel = new CheckableLabel(this);
 	newLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	newLabel->setScaledContents(true);
@@ -182,7 +184,7 @@ void QtViewer::addImage(const cv::Mat &matImage, QImage::Format format)
 
 void QtViewer::setImageProc(const cv::Mat &matImage, QImage::Format format)
 {
-	QImage newImage((uchar*)matImage.data, matImage.cols, matImage.rows, format);
+	QImage newImage((uchar*)matImage.data, matImage.cols, matImage.rows, matImage.step, format);
 	mImgLabelProc->setPixmap(QPixmap::fromImage(newImage));
 }
 bool QtViewer::loadFile(const QStringList &fileNames)
@@ -201,6 +203,7 @@ bool QtViewer::loadFile(const QStringList &fileNames)
 			continue;
 		}
 		addImage(mCvImgs.back());
+		
 		////! [2]
 		//cv::cvtColor(mCvImgs.back(), mCvImg, CV_BGR2RGB);
 		//setImage(mCvImg);
